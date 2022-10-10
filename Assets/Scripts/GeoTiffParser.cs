@@ -244,7 +244,7 @@ namespace YabbaDataDoo
         public Matrix4x4 TiffToGeoTransform;
         public Matrix4x4 GeoToTiffTransform;
 
-        public float ReadGeoPosition(float geoX, float geoY) 
+        public float ReadGeoPosition(float geoX, float geoY)
         {
             var geoPosition = new Vector4(geoX, geoY, 0, 1);
             var tiffPosition = GeoToTiffTransform * geoPosition;
