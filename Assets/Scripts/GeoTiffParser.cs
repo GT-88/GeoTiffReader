@@ -70,6 +70,7 @@ namespace YabbaDataDoo
                 // Geo extent
                 var geoXY1 = ApplyTransformation(new Vector2(0, arrayHeight), tiffToGeoMatrix);
                 var geoXY2 = ApplyTransformation(new Vector2(arrayWidth, 0), tiffToGeoMatrix);
+                var pixelSize = (geoXY2.x - geoXY1.x) / arrayWidth;
 
                 // Initialize geotiff map
                 var geoTiffData = new GeoTiffData
@@ -77,6 +78,7 @@ namespace YabbaDataDoo
                     RawData = rawData,
                     MinValue = minValue,
                     MaxValue = maxValue,
+                    pixelSize = pixelSize,
                     NoDataValue = noDataValue,
                     TiffToGeoTransform = tiffToGeoMatrix,
                     GeoToTiffTransform = geoToTiffMatrix,
@@ -235,7 +237,7 @@ namespace YabbaDataDoo
     {
         public float GeoX1, GeoY1;
         public float GeoX2, GeoY2;
-
+        public float pixelSize;
         public float MaxValue;
         public float MinValue;
         public float NoDataValue;
@@ -253,6 +255,31 @@ namespace YabbaDataDoo
             var tiffY = (int)tiffPosition.y;
 
             return RawData[tiffX, tiffY];
+        }
+
+        public float GetGeoSelection(Vector2 topLeft, Vector2 bottomRight)
+        {
+            var geoPositionTopLeft = new Vector4(topLeft.x, topLeft.y, 0, 1);
+            var geoPositionBottomRight = new Vector4(bottomRight.x, bottomRight.y, 0, 1);
+            var tiffPositionBottomLeft = GeoToTiffTransform * geoPositionTopLeft;
+            var tiffPositionTopRight = GeoToTiffTransform * geoPositionBottomRight;
+
+            var tiffX1 = (int)tiffPositionBottomLeft.x;
+            var tiffY1 = (int)tiffPositionBottomLeft.y;            
+            var tiffX2 = (int)tiffPositionTopRight.x;
+            var tiffY2 = (int)tiffPositionTopRight.y;
+
+            var totalValue = 0f;
+            for (int x = tiffX1; x < tiffX2+1; x++)
+            {
+                for (int y = tiffY1; y < tiffY2+1; y++)
+                {
+                    var value = RawData[x, y];
+                    if (value < 0 || float.IsNaN(value)) continue; // don't use the NoData values because this gives wrong results
+                    totalValue += value;
+                }
+            }
+            return totalValue;
         }
     }
 }

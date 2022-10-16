@@ -42,46 +42,52 @@ namespace YabbaDataDoo
 
         private static byte[] GetColor(float pixelvalue, GeoTiffData tiffData)
         {
+            if (pixelvalue > 20) pixelvalue = 20;
             byte[] color; //r,g,b,a
-            if (pixelvalue == tiffData.NoDataValue)
+            if (pixelvalue == tiffData.NoDataValue || pixelvalue <0)
             {
-                color = new byte[] { 0, 0, 0, 0 };
+                color = new byte[] { 0, 0, 0, 255 };
             }
-            else if (pixelvalue == 1)
+            else if (float.IsNaN(pixelvalue))
             {
-                color = new byte[] { 255, 0, 0, 255 };
+                color = new byte[] { 255, 255, 255, 255 };
             }
-            else if (pixelvalue == 2)
-            {
-                color = new byte[] { 0, 255, 0, 255 };
-            }
-            else if (pixelvalue == 3)
-            {
-                color = new byte[] { 0, 0, 255, 255 };
-            }
-            else if (pixelvalue == 4)
-            {
-                color = new byte[] { 100, 255, 0, 255 };
-            }
-            else if (pixelvalue == 5)
-            {
-                color = new byte[] { 100, 0, 100, 255 };
-            }
-            else if (pixelvalue == 8)
-            {
-                color = new byte[] { 200, 70, 10, 255 };
-            }
-            else if (pixelvalue == 10)
-            {
-                color = new byte[] { 100, 55, 200, 255 };
-            }
-            else if (pixelvalue == 13)
-            {
-                color = new byte[] { 40, 180, 255, 255 };
-            }
+            //else if (pixelvalue == 1)
+            //{
+            //    color = new byte[] { 255, 0, 0, 255 };
+            //}
+            //else if (pixelvalue == 2)
+            //{
+            //    color = new byte[] { 0, 255, 0, 255 };
+            //}
+            //else if (pixelvalue == 3)
+            //{
+            //    color = new byte[] { 0, 0, 255, 255 };
+            //}
+            //else if (pixelvalue == 4)
+            //{
+            //    color = new byte[] { 100, 255, 0, 255 };
+            //}
+            //else if (pixelvalue == 5)
+            //{
+            //    color = new byte[] { 100, 0, 100, 255 };
+            //}
+            //else if (pixelvalue == 8)
+            //{
+            //    color = new byte[] { 200, 70, 10, 255 };
+            //}
+            //else if (pixelvalue == 10)
+            //{
+            //    color = new byte[] { 100, 55, 200, 255 };
+            //}
+            //else if (pixelvalue == 13)
+            //{
+            //    color = new byte[] { 40, 180, 255, 255 };
+            //}
             else
             {
-                var value = (byte)((pixelvalue - tiffData.MinValue) / (tiffData.MaxValue - tiffData.MinValue) * 255);
+               // var value = (byte)((pixelvalue - tiffData.MinValue) / (tiffData.MaxValue - tiffData.MinValue) * 255);
+                var value = (byte)((pixelvalue + 10) / (30) * 255);
                 color = new byte[] { value, value, value, 255 };
             }
             return color;
